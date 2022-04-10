@@ -1,6 +1,8 @@
 ---
-title: ''
-output: html_document
+Purpose: Clean the survey data downloaded from the DHS website on National Demographic and Health survey 1998.
+Author: Zhihao Chen 
+ Data: 10 April 2022
+Contact: zhihao.chen@utoronto.ca 
 ---
 
 ```{r setup, include=FALSE}
@@ -16,24 +18,3 @@ names(raw)
 rm(raw)
 ```
 
-
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
