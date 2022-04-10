@@ -1,13 +1,50 @@
----
-title: "Reference"
-output: html_document
----
+@Manual{,
+    title = {RStudio: Integrated Development Environment for R},
+    author = {{RStudio Team}},
+    organization = {RStudio, PBC},
+    address = {Boston, MA},
+    year = {2021},
+    url = {http://www.rstudio.com/},
+  }
+  
+  @article{jurgens2018effect,
+  title={The effect of social media on the dynamics of (self) resilience during disasters: A literature review},
+  author={Jurgens, Manon and Helsloot, Ira},
+  journal={Journal of Contingencies and Crisis Management},
+  volume={26},
+  number={1},
+  pages={79--88},
+  year={2018},
+  publisher={Wiley Online Library}
+}
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+@article{levine2019mobile,
+  title={Mobile media use by infants and toddlers},
+  author={Levine, Laura E and Waite, Bradley M and Bowman, Laura L and Kachinsky, Kyla},
+  journal={Computers in Human Behavior},
+  volume={94},
+  pages={92--99},
+  year={2019},
+  publisher={Elsevier}
+}
 
-#Citing R-Studio
-```{r}
-RStudio.Version()
-```
+@article{qizi2019importance,
+  title={The importance of media in the learning process},
+  author={Qizi, Aminjonova Zulaykho Anvarjohn and O'G, Abduraimov Abdulaziz Ulug'Bek and Muzaffarovna, Akramova Nozima and others},
+  journal={Вопросы науки и образования},
+  number={3 (47)},
+  year={2019},
+  publisher={ООО {\guillemotleft}Олимп{\guillemotright}}
+}
+
+@article{oeldorf2018role,
+  title={The role of engagement in learning from active and incidental news exposure on social media},
+  author={Oeldorf-Hirsch, Anne},
+  journal={Mass communication and society},
+  volume={21},
+  number={2},
+  pages={225--247},
+  year={2018},
+  publisher={Taylor \& Francis}
+}
+
