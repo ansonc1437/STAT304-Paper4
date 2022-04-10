@@ -1,0 +1,209 @@
+---
+title: "STAT 304-Paper 4"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Installing packagaes
+```{r}
+library(pdftools)
+library(tidyverse)
+library(plyr)
+library(stringr)
+```
+
+###BACKGROUND CHARACTERISTICS AGE
+#Step1
+```{r}
+# Importing the pdf file
+setwd("C:/Users/USER/Desktop/xtra")
+PDF <- pdf_text("Media.pdf") %>% 
+#open the PDF inside your project folder  
+readr::read_lines() 
+# Removing empty lines
+PDF.media <-PDF[-c(1:6,46:52)] 
+```
+
+#Step2
+```{r,results='hide'}
+#Background characteristic - AGE
+PF.age <-PDF.media[-c(11:35)] # remove lines
+all_stat_lines <- PF.age[5:10] %>%
+  str_squish() %>%
+  strsplit(split = " ")# remove empty spaces
+#Defining variable names
+var_lines <- c("Background_characteristics","No mass media", "Read newspaper weekly", "Watch television weekly", "Listen to radio daily", "All three media","Number of women") 
+```
+
+#Step3- Distribution by age
+```{r}
+Age <- plyr::ldply(all_stat_lines) #create a data frame
+colnames(Age)<-var_lines
+```
+
+###BACKGROUND CHARACTERISTICS-RESIDENCE
+```{r}
+#Background characteristic - residence
+PF.resid <-PDF.media[-c(3:11,16:35)] # remove lines
+all_stat_lines1 <- PF.resid[5:6] %>%
+  str_squish() %>%
+  strsplit(split = " ")# remove empty spaces
+Residence<- plyr::ldply(all_stat_lines1) #create a data frame
+#Defining variable names
+colnames(Residence)<-var_lines
+```
+
+###BACKGROUND CHARACTERISTICS-EDUCATION
+```{r}
+all_stat_lines2 <- PDF.media[36:39] %>%
+  str_squish() %>%
+  strsplit(split = " ")# remove empty spaces
+all_stat_lines2[[1]] <- c("No Education", "42.6","2.6","20.1","53.6","1.8","217")
+all_stat_lines2[[3]] <- c("High School", "2.9","64.9","84.3","81.2","50.5","5916")
+all_stat_lines2[[4]] <- c("College or Higher", "1.0","84.4","92.2","84","68.8","4186")
+Educ<- plyr::ldply(all_stat_lines2) #create a data frame
+colnames(Educ)<-var_lines
+```
+
+#Combining the dataset
+```{r}
+DATA=rbind(Age,Educ,Residence)
+
+#Converting dataframe to csv
+write.csv(DATA,"C:\\Users\\USER\\Desktop\\xtra\\data.csv",row.names = FALSE)
+```
+
+#Distribution of media exposure by media type
+```{r}
+Dat<- read.csv(file = "data.csv")
+colMeans(Dat[,-1])
+Mean_Prop=c(57.6,74.33,77.25,44.21,18.15)
+Media_type=c("Newspaper","Television","Radio","All-media","No-media")
+Typ=cbind(Media_type,Mean_Prop);Typ
+tt=as.data.frame(Typ)
+#Bar chart plot for Proportion of age-group
+ggplot(data=tt, aes(x=Media_type, y=Mean_Prop,fill=Media_type)) +
+  geom_bar(stat="identity")+
+  geom_text(aes(label=Mean_Prop),vjust=-0.3, size=3.5)+
+  ggtitle("Distribution of exposure proportion based on Media type")+xlab('Mass Media Type')+
+  theme_minimal()
+```
+
+#Visualization by age-group
+```{r}
+#age
+Ag=Dat %>% slice(1:6)
+gg=(Ag[,-c(2,7)])
+gg$Average_Proportion=rowMeans(gg[,-1])
+Av_age=gg%>% select(1, 6)
+
+#Bar chart plot for Proportion of age-group
+ggplot(data=Av_age, aes(x=Background_characteristics, y=Average_Proportion,fill=Background_characteristics)) +
+  geom_bar(stat="identity")+
+  geom_text(aes(label=Average_Proportion),vjust=-0.3, size=3.5)+
+  ggtitle("Distribution of exposure proportion based on Age-Group")+xlab('Age-Group')+
+  theme_minimal()
+```
+
+#Visualisation by residence
+```{r}
+#Residence
+res=Dat %>% slice(11:12)
+rr= (res[,-c(2,7)])
+rr$Average_Proportion=rowMeans(rr[,-1])
+Av_resid=rr%>% select(1, 6);Av_resid
+#Pie chart
+daa <- rr %>% 
+  arrange(desc(Background_characteristics)) %>%
+  mutate(prop = round(Average_Proportion / sum(Average_Proportion) *100,digits =2)) %>%
+  mutate(ypos = round(cumsum(prop)- 0.5*prop ,digits = 2))
+# Pie chart
+   ggplot(daa, aes(x="", y=prop, fill=Background_characteristics)) +
+  geom_bar(stat="identity", width=1, color="white") +
+  coord_polar("y", start=0) +
+  theme_void() + 
+  geom_text(aes(y = ypos, label = prop), color = "white", size=6) +
+  scale_fill_brewer(palette="Set1")        
+```
+
+```{r}
+library(plotrix)
+ed=Dat %>% slice(7:10)
+edd= (ed[,-c(2,7)])
+edd$Average_Proportion=rowMeans(edd[,-1])
+Av_edd=edd%>% select(1, 6);Av_edd
+
+slices <- Av_edd$Average_Proportion
+
+##https://www.statmethods.net/graphs/pie.html
+#Pie chart plot
+percent <- round(slices/sum(slices)*100)
+labels <- Av_edd$Background_characteristics
+labels <- paste(labels, percent)
+labels <- paste(labels,"%",sep="")
+pie3D(slices,labels=labels,explode=0.1,
+   main="Proportion of women mass media exposure based on education level")
+```
+
+
+
+
+
+
+
+
+
+#Using pointblank
+```{r}
+library(pointblank)
+Dat<- read.csv(file = "data.csv")
+agent <- 
+  Dat%>%
+  create_agent() %>%
+  col_vals_in_set(vars(No.mass.media), value = 100) %>%
+  col_vals_lt(vars(Read.newspaper.weekly), value = 100) %>%
+  col_vals_regex(vars(Background_characteristics), regex = "^[0-9]-[a-z]{3}-[0-9]{3}$") %>%
+  col_vals_between(vars(Watch.television.weekly), value = 100) %>%
+  col_vals_between(vars(Listen.to.radio.daily), value = 100) %>%
+  col_vals_between(vars(All.three.media), value = 100) %>%
+  col_vals_between(vars(Number.of.women), left = 0, right = 8000) %>%
+  interrogate()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
