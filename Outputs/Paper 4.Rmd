@@ -1,0 +1,264 @@
+---
+title: "Women's Exposure to Mass Media"
+output:
+  word_document: default
+  html_document: default
+---
+
+#Abstract.
+
+Mass media plays a vital role in disseminating various information to the public. Social, political, environmental, health, and other issues are always shared through the media to ensure that a larger portion of the audience is reached. The main objective of this study was to assess the extent of women's exposure based on their background demographic and geographic characteristics. The demographic features included the individual's age group and level of education, while the geographic characteristic was their area of residence, whether urban or rural. The dataset was scraped from a publication on the Philippines National Demographic and Health survey of 1998 found on the Demographic and Health Surveys (DHS) website. Data preparation, cleaning, and analysis were carried out using R-Studio software. Concerning mass media, younger women were found to be more interested in it than old-aged women as they are vibrant and have a broad knowledge of what is happening around them. Education plays a crucial role in women's exposure to mass media since the most educated ones are regarded to be more exposed to mass media than illiterate individuals. Finally, a woman's residence plays a vital role in their exposure to mass media as the ones in urban areas are regarded as the ones to access more information due to their connectivity compared to those living in rural areas. 
+
+#Introduction.
+
+Exposure to mass media is how a particular audience encounters specific information or messages conveyed. The information reaches a large audience, so it is called mass media. The message has to be described most probably, and this is guided through the use of three measures related to exposure; survey, ecological, and hybrid measures. The most common types of mass media include newspapers, television, radio, the internet, and magazines, just to mention a few. Mass media is regarded as the only vehicle used in disseminating information from the primary source to the intended audience. The intended audience, in this case, is considered a large/ mass number of people. It is essential to note the impact of change in technology and its effects on social media since pictorial representation during the early age is not the same as at the moment ("importance of media in the learning process," 2019). The use of high-tech media is assumed to draw large masses into getting more information. 
+
+Mass media provides the audience with a wide range of choices in relation to the content they prefer to get from their preferred mass media. It is important to note that mass media plays a crucial role in societal influences. Mass media incorporates both institutional and technical methods used in disseminating information ("role of engagement in learning from active and incidental news exposure on social media," 2017). Modern culture has been driven by the intensive use of mass media as well as changing technology across all genders. The information provided through mass media, either written or spoken, significantly impacts society. Mass media is responsible for shaping how the audience views the world. Mass media is beneficial because it makes the world closer due to its connectivity nature. Apart from disseminating information, mass media provides entertainment and educates the audience ("effect of social media on the dynamics of (self) resilience during disasters: A literature review," 2019).  
+
+Across the globe, routine usage of mass media such as radio, Television, and Newspapers is widely used to convey the message to many masses. Therefore, it is evident that mass media plays a crucial role, especially in adopting a healthy lifestyle and health awareness. 
+
+When women are exposed to mass media, there is a change in awareness, social norms, behavior, and knowledge. Then, women's exposure to mass media is regarded as an essential tool to empower them in relation to their beliefs in society. Various factors determine the intensity of women's exposure to mass media, such as Age, Residence, and Education. Exposure is measured in terms of mass media's intensive or lesser intensive use ("Electronic media exposure and use among toddlers," 2018).
+
+The most applied factors in determining how women are exposed to mass media include age, education, and residence (urban/rural). The age of women varies, and it can be subdivided into young age, middle age, and old age. Concerning mass media, young age or teenagers are presumed not much interested in mass media compared to middle-aged women who are vibrant and have a comprehensive knowledge of what is happening around them through the aid of mass media. Middle-age women are regarded as the favorable age bracket, eager to know what is in the society. Education plays a crucial role in women's exposure to mass media since the most educated ones are regarded to be more exposed to mass media than illiterate individuals. Finally, a woman's residence plays a vital role in their exposure to mass media as the ones in urban areas are regarded as the ones to access more information due to their connectivity compared to those living in rural areas. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Installing packagaes
+```{r,message=FALSE,warning=FALSE,echo=FALSE}
+library(pdftools)
+library(tidyverse)
+library(plyr)
+library(stringr)
+```
+
+#Data
+
+The study aimed at assessing the extent of women's exposure based on their background demographic and geographic characteristics. The demographic features included the individual's age group and level of education, while the geographic characteristic was their area of residence, whether urban or rural. The dataset was scraped from a publication on the Philippines National Demographic and Health survey of 1998 found on the Demographic and Health Surveys (DHS) website (https://dhsprogram.com/publications/publication-fr103-dhs-final-reports.cfm). These data contained information on the proportion of exposure of the respondents to different types of mass media. The original data were collected from the respondents by asking whether they read the newspaper weekly, watched television weekly, listened to the radio daily, and whether they were either exposed to the three media or none. 
+
+Since the dataset had different and unequal categories for the background characteristics, each feature was extracted separately and then later combined to form one primary dataset. Data cleaning was done to make it analyzable. For instance, the original table had values separated by "commas," which the R-software might not understand and thus were cleaned by stripping off the commas. Furthermore, the table initially contained a region feature, but the essential characteristic, which was the area of residence, was used to engulf the variable for this study. Therefore, the final clean dataset contained the background characteristics (age group, residence, and level of education), and the original mass media types were retained.
+
+The proportion of women exposed to the different mass media categories was recorded at the levels of each background characteristic. The age group was classified from 15-19 to 45-49 at five years. The respondents either resided in the rural or urban areas, while the individual level of education varied as low as "no education" to "college or higher." 
+
+To obtain a general insight into the extent of women's exposure to mass media, the average proportion of each type of media was computed regardless of the background characteristics, as shown in the table below;
+
+```{r,results='hide',echo=FALSE}
+# Importing the pdf file
+PDF <- pdf_text("C:/Users/USER/Desktop/xtra/Media.pdf") %>% 
+#open the PDF inside your project folder  
+readr::read_lines() 
+# Removing empty lines
+PDF.media <-PDF[-c(1:6,46:52)] 
+```
+
+```{r,results='hide',message=FALSE,echo=FALSE,warning=FALSE}
+#Background characteristic - AGE
+PF.age <-PDF.media[-c(11:35)] # remove lines
+all_stat_lines <- PF.age[5:10] %>%
+  str_squish() %>%
+  strsplit(split = " ")# remove empty spaces
+#Defining variable names
+var_lines <- c("Background_characteristics","No mass media", "Read newspaper weekly", "Watch television weekly", "Listen to radio daily", "All three media","Number of women") 
+```
+
+```{r,results='hide',message=FALSE,echo=FALSE,warning=FALSE}
+Age <- plyr::ldply(all_stat_lines) #create a data frame
+colnames(Age)<-var_lines
+```
+
+
+```{r,results='hide',message=FALSE,echo=FALSE,warning=FALSE}
+#Background characteristic - residence
+PF.resid <-PDF.media[-c(3:11,16:35)] # remove lines
+all_stat_lines1 <- PF.resid[5:6] %>%
+  str_squish() %>%
+  strsplit(split = " ")# remove empty spaces
+Residence<- plyr::ldply(all_stat_lines1) #create a data frame
+#Defining variable names
+colnames(Residence)<-var_lines
+```
+
+```{r,results='hide',message=FALSE,echo=FALSE,warning=FALSE}
+all_stat_lines2 <- PDF.media[36:39] %>%
+  str_squish() %>%
+  strsplit(split = " ")# remove empty spaces
+all_stat_lines2[[1]] <- c("No Education", "42.6","2.6","20.1","53.6","1.8","217")
+all_stat_lines2[[3]] <- c("High School", "2.9","64.9","84.3","81.2","50.5","5916")
+all_stat_lines2[[4]] <- c("College or Higher", "1.0","84.4","92.2","84","68.8","4186")
+Educ<- plyr::ldply(all_stat_lines2) #create a data frame
+colnames(Educ)<-var_lines
+```
+
+```{r,results='hide',message=FALSE,echo=FALSE,warning=FALSE}
+DATA=rbind(Age,Educ,Residence)
+
+#Converting dataframe to csv
+write.csv(DATA,"C:\\Users\\USER\\Desktop\\xtra\\data.csv",row.names = FALSE)
+```
+
+#RESULTS.
+
+This section entails unearthing a deeper relationship between women's exposure to mass media based on background demographic and geographical characteristics. Descriptive summary statistics on each background characteristic were discussed below;
+
+
+
+#Proportion of exposure per media type.
+
+```{r,message=FALSE,echo=FALSE,warning=FALSE}
+Dat<- read.csv(file = "data.csv")
+colMeans(Dat[,-1])
+```
+
+Approximately 77.25% of women listen to the radio daily, and 74.33% watch television weekly to the table above. However, it was found that, on average, the proportion of women who read the newspaper weekly and those who do not are almost similar. Most importantly, a very small percentage (8.15%) of the Philippines women have no access to any of the mass media types.
+
+
+```{r,echo=FALSE}
+Mean_Prop=c(57.6,74.33,77.25,44.21,18.15)
+Media_type=c("Newspaper","Television","Radio","All-media","No-media")
+Typ=cbind(Media_type,Mean_Prop)
+tt=as.data.frame(Typ)
+#Bar chart plot for Proportion of age-group
+ggplot(data=tt, aes(x=Media_type, y=Mean_Prop,fill=Media_type)) +
+  geom_bar(stat="identity")+
+  geom_text(aes(label=Mean_Prop),vjust=-0.3, size=3.5)+
+  ggtitle("Distribution of exposure proportion based on Media type")+xlab('Mass Media Type')+
+  theme_minimal()
+```
+
+
+#A. Media exposure by age-group.
+
+```{r,echo=FALSE}
+#age
+Ag=Dat %>% slice(1:6)
+gg=(Ag[,-c(2,7)])
+gg$Average_Proportion=rowMeans(gg[,-1])
+Av_age=gg%>% select(1, 6)
+Av_age
+```
+
+Based on the table above, the proportion of women exposed decreases as the age of a woman increases. The above was illustrated by the bar chart plot below;
+
+```{r,echo=FALSE}
+#Bar chart plot for Proportion of age-group
+ggplot(data=Av_age, aes(x=Background_characteristics, y=Average_Proportion,fill=Background_characteristics)) +
+  geom_bar(stat="identity")+
+  geom_text(aes(label=Average_Proportion),vjust=-0.3, size=3.5)+
+  ggtitle("Distribution of exposure proportion based on Age-Group")+xlab('Age-Group')+
+  theme_minimal()
+```
+From the bar chart, it was clear that the proportion of women exposed to the different types of mass media decreases as the age group rises. However, above the age of 30, the rate of media exposure flattens, indicating no significant media influence in old age.
+
+#B.	Mass media exposure by area of residence.
+
+```{r,echo=FALSE}
+#Residence
+res=Dat %>% slice(11:12)
+rr= (res[,-c(2,7)])
+rr$Average_Proportion=rowMeans(rr[,-1])
+Av_resid=rr%>% select(1, 6);Av_resid
+```
+
+In the above table, of the women population in the urban areas, 75.93% of them were exposed to any form of mass media while 56.98% of the rural area residents were exposed.
+
+```{r,echo=FALSE}
+#Pie chart
+daa <- rr %>% 
+  arrange(desc(Background_characteristics)) %>%
+  mutate(prop = round(Average_Proportion / sum(Average_Proportion) *100,digits =2)) %>%
+  mutate(ypos = round(cumsum(prop)- 0.5*prop ,digits = 2))
+# Pie chart
+   ggplot(daa, aes(x="", y=prop, fill=Background_characteristics)) +
+  geom_bar(stat="identity", width=1, color="white") +
+  coord_polar("y", start=0) +
+  theme_void() + 
+  geom_text(aes(y = ypos, label = prop), color = "white", size=6) +
+  scale_fill_brewer(palette="Set1") 
+```
+
+From the pie chart above, a more significant proportion (57.13%) of women exposed to mass media resided in urban areas compared to the (42.87%) of women in the rural areas exposed to media. This could be attributed to easier accessibility of newspapers and better connectivity or transmissions for radio and televisions in the urban areas.
+
+#C.	Mass media exposure by level of education.
+```{r,echo=FALSE}
+library(plotrix)
+ed=Dat %>% slice(7:10)
+edd= (ed[,-c(2,7)])
+edd$Average_Proportion=rowMeans(edd[,-1])
+Av_edd=edd%>% select(1, 6);Av_edd
+
+```
+
+Women who attained college or higher education qualifications tend to be highly exposed to mass media. From Table 4 above, 82.35% of the women who have completed college or higher level of education have been exposed to any form of mass media. In comparison, 70.23% of high school graduates are exposed to media. However, the proportion of women with elementary education who were not exposed to media was approximately equal for those not exposed to the same level of education. The information above could be further illustrated by the chart below;
+
+```{r,echo=FALSE}
+slices <- Av_edd$Average_Proportion
+
+##https://www.statmethods.net/graphs/pie.html
+#Pie chart plot
+percent <- round(slices/sum(slices)*100)
+labels <- Av_edd$Background_characteristics
+labels <- paste(labels, percent)
+labels <- paste(labels,"%",sep="")
+pie3D(slices,labels=labels,explode=0.1,
+   main="Proportion of women mass media exposure based on education level")
+```
+
+The pie chart above indicates the categorization of all the women exposed according to their level of education. From the figure, it was clear that education determines the extent of exposure to mass media. Of all the women exposed, 37%, 32%, and 22% have attained college or higher, high school, and elementary level, respectively.
+
+
+#DISCUSSION.
+
+The findings of these studies indicate that most women in the Philippines are exposed to mass media only that different women get exposed to different types of media while others are exposed to all forms. 57.13% of women exposed to mass media resided in urban areas 42.87% lived in rural areas. This can be attributed to better connectivity of both radio and television transmissions. Furthermore, most newspapers are produced in urban areas, increasing their accessibility. There was the highest proportion of women watching television and reading newspapers in the urban areas compared to those in the rural areas. However, the proportion of women listening to the radio daily was approximately equal in urban and rural areas. Women between ages 15 and 29 are more exposed than those older than 30 years, as there was a significant difference between the categories. Over the age bracket (15-29 years), the proportion of women exposed to listening to radio daily and watching television weekly was above 80%. Therefore, older women were less likely to have been exposed to mass media than young women in their active ages. The level of education was found to positively and significantly determine the level of mass media exposure. 82.35% of women who had college or higher level qualifications and 70.23% of women who had high school qualifications were exposed to mass media.
+
+#REFERENCES
+
+@Manual{,
+    title = {RStudio: Integrated Development Environment for R},
+    author = {{RStudio Team}},
+    organization = {RStudio, PBC},
+    address = {Boston, MA},
+    year = {2021},
+    url = {http://www.rstudio.com/},
+  }
+  
+  @article{jurgens2018effect,
+  title={The effect of social media on the dynamics of (self) resilience during disasters: A literature review},
+  author={Jurgens, Manon and Helsloot, Ira},
+  journal={Journal of Contingencies and Crisis Management},
+  volume={26},
+  number={1},
+  pages={79--88},
+  year={2018},
+  publisher={Wiley Online Library}
+}
+
+@article{levine2019mobile,
+  title={Mobile media use by infants and toddlers},
+  author={Levine, Laura E and Waite, Bradley M and Bowman, Laura L and Kachinsky, Kyla},
+  journal={Computers in Human Behavior},
+  volume={94},
+  pages={92--99},
+  year={2019},
+  publisher={Elsevier}
+}
+
+@article{qizi2019importance,
+  title={The importance of media in the learning process},
+  author={Qizi, Aminjonova Zulaykho Anvarjohn and O'G, Abduraimov Abdulaziz Ulug'Bek and Muzaffarovna, Akramova Nozima and others},
+  journal={Вопросы науки и образования},
+  number={3 (47)},
+  year={2019},
+  publisher={ООО {\guillemotleft}Олимп{\guillemotright}}
+}
+
+@article{oeldorf2018role,
+  title={The role of engagement in learning from active and incidental news exposure on social media},
+  author={Oeldorf-Hirsch, Anne},
+  journal={Mass communication and society},
+  volume={21},
+  number={2},
+  pages={225--247},
+  year={2018},
+  publisher={Taylor \& Francis}
+}
